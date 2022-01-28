@@ -254,6 +254,9 @@ def OMPC_IsDevicePtr : Clause<"is_device_ptr"> {
   let flangClass = "Name";
   let isValueList = true;
 }
+def OMPC_HasDeviceAddr : Clause<"has_device_addr"> {
+  let clangClass = "OMPHasDeviceAddrClause";
+}
 def OMPC_TaskReduction : Clause<"task_reduction"> {
   let clangClass = "OMPTaskReductionClause";
   let flangClass = "OmpReductionClause";
@@ -557,6 +560,7 @@ def OMP_Target : Directive<"target"> {
     VersionedClause<OMPC_Depend>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Reduction>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_UsesAllocators, 50>
@@ -645,6 +649,7 @@ def OMP_TargetParallel : Directive<"target parallel"> {
     VersionedClause<OMPC_Shared>,
     VersionedClause<OMPC_Reduction>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_UsesAllocators, 50>
   ];
@@ -677,6 +682,7 @@ def OMP_TargetParallelFor : Directive<"target parallel for"> {
     VersionedClause<OMPC_Ordered>,
     VersionedClause<OMPC_Linear>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_Order, 50>,
     VersionedClause<OMPC_UsesAllocators, 50>
@@ -693,6 +699,7 @@ def OMP_TargetParallelDo : Directive<"target parallel do"> {
     VersionedClause<OMPC_Reduction>,
     VersionedClause<OMPC_Linear>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Allocator>,
     VersionedClause<OMPC_Order>,
     VersionedClause<OMPC_UsesAllocators>,
@@ -1126,6 +1133,7 @@ def OMP_TargetParallelForSimd : Directive<"target parallel for simd"> {
     VersionedClause<OMPC_SimdLen>,
     VersionedClause<OMPC_Aligned>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_NonTemporal, 50>,
     VersionedClause<OMPC_Order, 50>,
@@ -1156,6 +1164,7 @@ def OMP_TargetParallelDoSimd : Directive<"target parallel do simd"> {
     VersionedClause<OMPC_SimdLen>,
     VersionedClause<OMPC_Aligned>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_NonTemporal>,
     VersionedClause<OMPC_Order>,
@@ -1169,6 +1178,7 @@ def OMP_TargetSimd : Directive<"target simd"> {
     VersionedClause<OMPC_Depend>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_LastPrivate>,
     VersionedClause<OMPC_Linear>,
     VersionedClause<OMPC_Map>,
@@ -1342,6 +1352,7 @@ def OMP_TargetTeams : Directive<"target teams"> {
     VersionedClause<OMPC_Depend>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Reduction>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_UsesAllocators, 50>,
@@ -1365,6 +1376,7 @@ def OMP_TargetTeamsDistribute : Directive<"target teams distribute"> {
     VersionedClause<OMPC_Depend>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Reduction>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_UsesAllocators, 50>,
@@ -1395,6 +1407,7 @@ def OMP_TargetTeamsDistributeParallelFor :
     VersionedClause<OMPC_DefaultMap>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Default>,
     VersionedClause<OMPC_Shared>,
     VersionedClause<OMPC_Reduction>,
@@ -1420,6 +1433,7 @@ def OMP_TargetTeamsDistributeParallelDo :
     VersionedClause<OMPC_Depend>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Reduction>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_UsesAllocators>,
@@ -1456,6 +1470,7 @@ def OMP_TargetTeamsDistributeParallelForSimd :
     VersionedClause<OMPC_DefaultMap>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Default>,
     VersionedClause<OMPC_Shared>,
     VersionedClause<OMPC_Reduction>,
@@ -1485,6 +1500,7 @@ def OMP_TargetTeamsDistributeParallelDoSimd :
     VersionedClause<OMPC_Depend>,
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_Reduction>,
     VersionedClause<OMPC_Allocate>,
     VersionedClause<OMPC_UsesAllocators>,
@@ -1523,6 +1539,7 @@ def OMP_TargetTeamsDistributeSimd :
     VersionedClause<OMPC_FirstPrivate>,
     VersionedClause<OMPC_If>,
     VersionedClause<OMPC_IsDevicePtr>,
+    VersionedClause<OMPC_HasDeviceAddr>,
     VersionedClause<OMPC_LastPrivate>,
     VersionedClause<OMPC_Linear>,
     VersionedClause<OMPC_Map>,

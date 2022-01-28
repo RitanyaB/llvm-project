@@ -7416,6 +7416,72 @@ public:
   }
 };
 
+/// This represents clause 'has_device_addr' in the '#pragma omp ...'
+/// directives.
+///
+/// \code
+/// #pragma omp target has_device_addr(a,b)
+/// \endcode
+/// In this example directive '#pragma omp target' has clause
+/// 'has_device_addr' with the variables 'a' and 'b'.
+///
+class OMPHasDeviceAddrClause final
+    : public OMPMappableExprListClause<OMPHasDeviceAddrClause>,
+      private llvm::TrailingObjects<
+          OMPHasDeviceAddrClause, Expr *, ValueDecl *, unsigned,
+          OMPClauseMappableExprCommon::MappableComponent> {
+  friend class OMPClauseReader;
+  friend OMPMappableExprListClause;
+  friend OMPVarListClause;
+  friend TrailingObjects;
+  explicit OMPHasDeviceAddrClause(const OMPVarListLocTy &Locs,
+                                const OMPMappableExprListSizeTy &Sizes)
+      : OMPMappableExprListClause(llvm::omp::OMPC_has_device_addr, Locs, Sizes) {}
+  //Empty Clause
+ explicit OMPHasDeviceAddrClause(const OMPMappableExprListSizeTy &Sizes)
+      : OMPMappableExprListClause(llvm::omp::OMPC_has_device_addr,
+                                  OMPVarListLocTy(), Sizes) {}
+  size_t numTrailingObjects(OverloadToken<Expr *>) const {
+    return varlist_size();
+  }
+  size_t numTrailingObjects(OverloadToken<ValueDecl *>) const {
+    return getUniqueDeclarationsNum();
+  }
+  size_t numTrailingObjects(OverloadToken<unsigned>) const {
+    return getUniqueDeclarationsNum() + getTotalComponentListNum();
+  }
+
+public:
+   static OMPHasDeviceAddrClause *
+  Create(const ASTContext &C, const OMPVarListLocTy &Locs,
+         ArrayRef<Expr *> Vars, ArrayRef<ValueDecl *> Declarations,
+         MappableExprComponentListsRef ComponentLists);
+//Empty Clause
+  static OMPHasDeviceAddrClause *
+  CreateEmpty(const ASTContext &C, const OMPMappableExprListSizeTy &Sizes);
+
+  child_range children() {
+    return child_range(reinterpret_cast<Stmt **>(varlist_begin()),
+                       reinterpret_cast<Stmt **>(varlist_end()));
+  }
+
+  const_child_range children() const {
+    auto Children = const_cast<OMPHasDeviceAddrClause *>(this)->children();
+    return const_child_range(Children.begin(), Children.end());
+  }
+
+  child_range used_children() {
+    return child_range(child_iterator(), child_iterator());
+  }
+  const_child_range used_children() const {
+    return const_child_range(const_child_iterator(), const_child_iterator());
+  }
+
+  static bool classof(const OMPClause *T) {
+    return T->getClauseKind() == llvm::omp::OMPC_has_device_addr;
+  }
+};
+
 /// This represents clause 'nontemporal' in the '#pragma omp ...' directives.
 ///
 /// \code
