@@ -53,14 +53,12 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[ARRAY_BEGIN:%.*]] = getelementptr inbounds [5 x %struct.S], [5 x %struct.S]* [[C]], i32 0, i32 0
 // CHECK1-NEXT:    [[ARRAYCTOR_END:%.*]] = getelementptr inbounds [[STRUCT_S:%.*]], %struct.S* [[ARRAY_BEGIN]], i64 5
 // CHECK1-NEXT:    br label [[ARRAYCTOR_LOOP:%.*]]
-//
 // CHECK1:       arrayctor.loop:
 // CHECK1-NEXT:    [[ARRAYCTOR_CUR:%.*]] = phi %struct.S* [ [[ARRAY_BEGIN]], [[ENTRY:%.*]] ], [ [[ARRAYCTOR_NEXT:%.*]], [[ARRAYCTOR_LOOP]] ]
 // CHECK1-NEXT:    call void @_ZN1SC1Ev(%struct.S* nonnull align 4 dereferenceable(4) [[ARRAYCTOR_CUR]])
 // CHECK1-NEXT:    [[ARRAYCTOR_NEXT]] = getelementptr inbounds [[STRUCT_S]], %struct.S* [[ARRAYCTOR_CUR]], i64 1
 // CHECK1-NEXT:    [[ARRAYCTOR_DONE:%.*]] = icmp eq %struct.S* [[ARRAYCTOR_NEXT]], [[ARRAYCTOR_END]]
 // CHECK1-NEXT:    br i1 [[ARRAYCTOR_DONE]], label [[ARRAYCTOR_CONT:%.*]], label [[ARRAYCTOR_LOOP]]
-//
 // CHECK1:       arrayctor.cont:
 // CHECK1-NEXT:    [[TMP1:%.*]] = load i32, i32* [[ARGC_ADDR]], align 4
 // CHECK1-NEXT:    [[TMP2:%.*]] = zext i32 [[TMP1]] to i64
@@ -176,17 +174,16 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[ARRAY_BEGIN7:%.*]] = getelementptr inbounds [5 x %struct.S], [5 x %struct.S]* [[C]], i32 0, i32 0
 // CHECK1-NEXT:    [[TMP60:%.*]] = getelementptr inbounds [[STRUCT_S]], %struct.S* [[ARRAY_BEGIN7]], i64 5
 // CHECK1-NEXT:    br label [[ARRAYDESTROY_BODY:%.*]]
-//
 // CHECK1:       arraydestroy.body:
 // CHECK1-NEXT:    [[ARRAYDESTROY_ELEMENTPAST:%.*]] = phi %struct.S* [ [[TMP60]], [[ARRAYCTOR_CONT]] ], [ [[ARRAYDESTROY_ELEMENT:%.*]], [[ARRAYDESTROY_BODY]] ]
 // CHECK1-NEXT:    [[ARRAYDESTROY_ELEMENT]] = getelementptr inbounds [[STRUCT_S]], %struct.S* [[ARRAYDESTROY_ELEMENTPAST]], i64 -1
 // CHECK1-NEXT:    call void @_ZN1SD1Ev(%struct.S* nonnull align 4 dereferenceable(4) [[ARRAYDESTROY_ELEMENT]]) #[[ATTR3:[0-9]+]]
 // CHECK1-NEXT:    [[ARRAYDESTROY_DONE:%.*]] = icmp eq %struct.S* [[ARRAYDESTROY_ELEMENT]], [[ARRAY_BEGIN7]]
 // CHECK1-NEXT:    br i1 [[ARRAYDESTROY_DONE]], label [[ARRAYDESTROY_DONE8:%.*]], label [[ARRAYDESTROY_BODY]]
-//
 // CHECK1:       arraydestroy.done8:
 // CHECK1-NEXT:    [[TMP61:%.*]] = load i32, i32* [[RETVAL]], align 4
 // CHECK1-NEXT:    ret i32 [[TMP61]]
+//
 //
 // CHECK1-LABEL: define {{[^@]+}}@_ZN1SC1Ev
 // CHECK1-SAME: (%struct.S* nonnull align 4 dereferenceable(4) [[THIS:%.*]]) unnamed_addr #[[ATTR1:[0-9]+]] align 2 {
@@ -196,6 +193,7 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[THIS1:%.*]] = load %struct.S*, %struct.S** [[THIS_ADDR]], align 8
 // CHECK1-NEXT:    call void @_ZN1SC2Ev(%struct.S* nonnull align 4 dereferenceable(4) [[THIS1]])
 // CHECK1-NEXT:    ret void
+//
 //
 // CHECK1-LABEL: define {{[^@]+}}@.red_init.
 // CHECK1-SAME: (i8* noalias [[TMP0:%.*]], i8* noalias [[TMP1:%.*]]) #[[ATTR5:[0-9]+]] {
@@ -227,6 +225,7 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    store i32 [[ADD]], i32* [[TMP3]], align 4
 // CHECK1-NEXT:    ret void
 //
+//
 // CHECK1-LABEL: define {{[^@]+}}@.red_init..1
 // CHECK1-SAME: (i8* noalias [[TMP0:%.*]], i8* noalias [[TMP1:%.*]]) #[[ATTR5]] {
 // CHECK1-NEXT:  entry:
@@ -238,6 +237,7 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP3:%.*]] = load float*, float** [[TMP2]], align 8
 // CHECK1-NEXT:    store float 0.000000e+00, float* [[TMP3]], align 4
 // CHECK1-NEXT:    ret void
+//
 //
 // CHECK1-LABEL: define {{[^@]+}}@.red_comb..2
 // CHECK1-SAME: (i8* [[TMP0:%.*]], i8* [[TMP1:%.*]]) #[[ATTR5]] {
@@ -256,6 +256,7 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    store float [[ADD]], float* [[TMP3]], align 4
 // CHECK1-NEXT:    ret void
 //
+//
 // CHECK1-LABEL: define {{[^@]+}}@.red_init..3
 // CHECK1-SAME: (i8* noalias [[TMP0:%.*]], i8* noalias [[TMP1:%.*]]) #[[ATTR5]] {
 // CHECK1-NEXT:  entry:
@@ -267,6 +268,7 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP3:%.*]] = load i32*, i32** [[TMP2]], align 8
 // CHECK1-NEXT:    store i32 0, i32* [[TMP3]], align 4
 // CHECK1-NEXT:    ret void
+//
 //
 // CHECK1-LABEL: define {{[^@]+}}@.red_comb..4
 // CHECK1-SAME: (i8* [[TMP0:%.*]], i8* [[TMP1:%.*]]) #[[ATTR5]] {
@@ -285,6 +287,7 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    store i32 [[ADD]], i32* [[TMP3]], align 4
 // CHECK1-NEXT:    ret void
 //
+//
 // CHECK1-LABEL: define {{[^@]+}}@.red_init..5
 // CHECK1-SAME: (i8* noalias [[TMP0:%.*]], i8* noalias [[TMP1:%.*]]) #[[ATTR5]] {
 // CHECK1-NEXT:  entry:
@@ -298,14 +301,12 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP4:%.*]] = getelementptr [[STRUCT_S:%.*]], %struct.S* [[ARRAY_BEGIN]], i64 5
 // CHECK1-NEXT:    [[OMP_ARRAYINIT_ISEMPTY:%.*]] = icmp eq %struct.S* [[ARRAY_BEGIN]], [[TMP4]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYINIT_ISEMPTY]], label [[OMP_ARRAYINIT_DONE:%.*]], label [[OMP_ARRAYINIT_BODY:%.*]]
-//
 // CHECK1:       omp.arrayinit.body:
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DESTELEMENTPAST:%.*]] = phi %struct.S* [ [[ARRAY_BEGIN]], [[ENTRY:%.*]] ], [ [[OMP_ARRAYCPY_DEST_ELEMENT:%.*]], [[OMP_ARRAYINIT_BODY]] ]
 // CHECK1-NEXT:    call void @_ZN1SC1Ev(%struct.S* nonnull align 4 dereferenceable(4) [[OMP_ARRAYCPY_DESTELEMENTPAST]])
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DEST_ELEMENT]] = getelementptr [[STRUCT_S]], %struct.S* [[OMP_ARRAYCPY_DESTELEMENTPAST]], i32 1
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DONE:%.*]] = icmp eq %struct.S* [[OMP_ARRAYCPY_DEST_ELEMENT]], [[TMP4]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYCPY_DONE]], label [[OMP_ARRAYINIT_DONE]], label [[OMP_ARRAYINIT_BODY]]
-//
 // CHECK1:       omp.arrayinit.done:
 // CHECK1-NEXT:    ret void
 //
@@ -320,14 +321,12 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[ARRAY_BEGIN:%.*]] = getelementptr inbounds [5 x %struct.S], [5 x %struct.S]* [[TMP2]], i32 0, i32 0
 // CHECK1-NEXT:    [[TMP3:%.*]] = getelementptr inbounds [[STRUCT_S:%.*]], %struct.S* [[ARRAY_BEGIN]], i64 5
 // CHECK1-NEXT:    br label [[ARRAYDESTROY_BODY:%.*]]
-//
 // CHECK1:       arraydestroy.body:
 // CHECK1-NEXT:    [[ARRAYDESTROY_ELEMENTPAST:%.*]] = phi %struct.S* [ [[TMP3]], [[ENTRY:%.*]] ], [ [[ARRAYDESTROY_ELEMENT:%.*]], [[ARRAYDESTROY_BODY]] ]
 // CHECK1-NEXT:    [[ARRAYDESTROY_ELEMENT]] = getelementptr inbounds [[STRUCT_S]], %struct.S* [[ARRAYDESTROY_ELEMENTPAST]], i64 -1
 // CHECK1-NEXT:    call void @_ZN1SD1Ev(%struct.S* nonnull align 4 dereferenceable(4) [[ARRAYDESTROY_ELEMENT]]) #3
 // CHECK1-NEXT:    [[ARRAYDESTROY_DONE:%.*]] = icmp eq %struct.S* [[ARRAYDESTROY_ELEMENT]], [[ARRAY_BEGIN]]
 // CHECK1-NEXT:    br i1 [[ARRAYDESTROY_DONE]], label [[ARRAYDESTROY_DONE1:%.*]], label [[ARRAYDESTROY_BODY]]
-//
 // CHECK1:       arraydestroy.done1:
 // CHECK1-NEXT:    ret void
 //
@@ -357,7 +356,6 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP6:%.*]] = getelementptr [[STRUCT_S]], %struct.S* [[TMP3]], i64 5
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_ISEMPTY:%.*]] = icmp eq %struct.S* [[TMP3]], [[TMP6]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYCPY_ISEMPTY]], label [[OMP_ARRAYCPY_DONE2:%.*]], label [[OMP_ARRAYCPY_BODY:%.*]]
-//
 // CHECK1:       omp.arraycpy.body:
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_SRCELEMENTPAST:%.*]] = phi %struct.S* [ [[TMP5]], [[ENTRY:%.*]] ], [ [[OMP_ARRAYCPY_SRC_ELEMENT:%.*]], [[OMP_ARRAYCPY_BODY]] ]
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DESTELEMENTPAST:%.*]] = phi %struct.S* [ [[TMP3]], [[ENTRY]] ], [ [[OMP_ARRAYCPY_DEST_ELEMENT:%.*]], [[OMP_ARRAYCPY_BODY]] ]
@@ -368,7 +366,6 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_SRC_ELEMENT]] = getelementptr [[STRUCT_S]], %struct.S* [[OMP_ARRAYCPY_SRCELEMENTPAST]], i32 1
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DONE:%.*]] = icmp eq %struct.S* [[OMP_ARRAYCPY_DEST_ELEMENT]], [[TMP6]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYCPY_DONE]], label [[OMP_ARRAYCPY_DONE2]], label [[OMP_ARRAYCPY_BODY]]
-//
 // CHECK1:       omp.arraycpy.done2:
 // CHECK1-NEXT:    ret void
 //
@@ -415,14 +412,12 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP8:%.*]] = getelementptr i16, i16* [[TMP4]], i64 [[TMP7]]
 // CHECK1-NEXT:    [[OMP_ARRAYINIT_ISEMPTY:%.*]] = icmp eq i16* [[TMP4]], [[TMP8]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYINIT_ISEMPTY]], label [[OMP_ARRAYINIT_DONE:%.*]], label [[OMP_ARRAYINIT_BODY:%.*]]
-//
 // CHECK1:       omp.arrayinit.body:
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DESTELEMENTPAST:%.*]] = phi i16* [ [[TMP4]], [[ENTRY:%.*]] ], [ [[OMP_ARRAYCPY_DEST_ELEMENT:%.*]], [[OMP_ARRAYINIT_BODY]] ]
 // CHECK1-NEXT:    store i16 0, i16* [[OMP_ARRAYCPY_DESTELEMENTPAST]], align 2
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DEST_ELEMENT]] = getelementptr i16, i16* [[OMP_ARRAYCPY_DESTELEMENTPAST]], i32 1
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DONE:%.*]] = icmp eq i16* [[OMP_ARRAYCPY_DEST_ELEMENT]], [[TMP8]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYCPY_DONE]], label [[OMP_ARRAYINIT_DONE]], label [[OMP_ARRAYINIT_BODY]]
-//
 // CHECK1:       omp.arrayinit.done:
 // CHECK1-NEXT:    ret void
 //
@@ -445,7 +440,6 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP10:%.*]] = getelementptr i16, i16* [[TMP7]], i64 [[TMP5]]
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_ISEMPTY:%.*]] = icmp eq i16* [[TMP7]], [[TMP10]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYCPY_ISEMPTY]], label [[OMP_ARRAYCPY_DONE4:%.*]], label [[OMP_ARRAYCPY_BODY:%.*]]
-//
 // CHECK1:       omp.arraycpy.body:
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_SRCELEMENTPAST:%.*]] = phi i16* [ [[TMP9]], [[ENTRY:%.*]] ], [ [[OMP_ARRAYCPY_SRC_ELEMENT:%.*]], [[OMP_ARRAYCPY_BODY]] ]
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DESTELEMENTPAST:%.*]] = phi i16* [ [[TMP7]], [[ENTRY]] ], [ [[OMP_ARRAYCPY_DEST_ELEMENT:%.*]], [[OMP_ARRAYCPY_BODY]] ]
@@ -460,9 +454,9 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_SRC_ELEMENT]] = getelementptr i16, i16* [[OMP_ARRAYCPY_SRCELEMENTPAST]], i32 1
 // CHECK1-NEXT:    [[OMP_ARRAYCPY_DONE:%.*]] = icmp eq i16* [[OMP_ARRAYCPY_DEST_ELEMENT]], [[TMP10]]
 // CHECK1-NEXT:    br i1 [[OMP_ARRAYCPY_DONE]], label [[OMP_ARRAYCPY_DONE4]], label [[OMP_ARRAYCPY_BODY]]
-//
 // CHECK1:       omp.arraycpy.done4:
 // CHECK1-NEXT:    ret void
+//
 //
 // CHECK1-LABEL: define {{[^@]+}}@.omp_outlined.
 // CHECK1-SAME: (i32* noalias [[DOTGLOBAL_TID_:%.*]], i32* noalias [[DOTBOUND_TID_:%.*]], i32* nonnull align 4 dereferenceable(4) [[A:%.*]], i64 [[VLA:%.*]], i16* nonnull align 2 dereferenceable(2) [[D:%.*]], i8** nonnull align 8 dereferenceable(8) [[DOTTASK_RED_:%.*]]) #[[ATTR8:[0-9]+]] {
@@ -531,12 +525,10 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP2:%.*]] = load i16*, i16** [[D_ADDR]], align 8
 // CHECK1-NEXT:    store i32 0, i32* [[I]], align 4
 // CHECK1-NEXT:    br label [[FOR_COND:%.*]]
-//
 // CHECK1:       for.cond:
 // CHECK1-NEXT:    [[TMP3:%.*]] = load i32, i32* [[I]], align 4
 // CHECK1-NEXT:    [[CMP:%.*]] = icmp slt i32 [[TMP3]], 5
 // CHECK1-NEXT:    br i1 [[CMP]], label [[FOR_BODY:%.*]], label [[FOR_END:%.*]]
-//
 // CHECK1:       for.body:
 // CHECK1-NEXT:    [[TMP4:%.*]] = load i32, i32* [[TMP0]], align 4
 // CHECK1-NEXT:    [[IDXPROM_I:%.*]] = sext i32 [[TMP4]] to i64
@@ -547,13 +539,11 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[ADD:%.*]] = add nsw i32 [[TMP6]], [[CONV]]
 // CHECK1-NEXT:    store i32 [[ADD]], i32* [[TMP0]], align 4
 // CHECK1-NEXT:    br label [[FOR_INC:%.*]]
-//
 // CHECK1:       for.inc:
 // CHECK1-NEXT:    [[TMP7:%.*]] = load i32, i32* [[I]], align 4
 // CHECK1-NEXT:    [[INC:%.*]] = add nsw i32 [[TMP7]], 1
 // CHECK1-NEXT:    store i32 [[INC]], i32* [[I]], align 4
 // CHECK1-NEXT:    br label [[FOR_COND]], !llvm.loop [[LOOP3:![0-9]+]]
-//
 // CHECK1:       for.end
 // CHECK1-NEXT:    ret void
 //
@@ -628,6 +618,7 @@ int main(int argc, char **argv) {
 // CHECK1-NEXT:    [[TMP29:%.*]] = load i8*, i8** [[TMP18]], align 8
 // CHECK1-NEXT:    call void @__omp_offloading_{{.*}}_main_l{{[0-9]+}}(i32* [[TMP26]], i64 [[TMP14]], i16* [[TMP28]], i8* [[TMP29]]) #[[ATTR3]]
 // CHECK1-NEXT:    ret i32 0
+//
 //
 // CHECK1-LABEL: define {{[^@]+}}@_ZN1SC2Ev
 // CHECK1-SAME: (%struct.S* nonnull align 4 dereferenceable(4) [[THIS:%.*]]) unnamed_addr #[[ATTR1]] align 2 {
