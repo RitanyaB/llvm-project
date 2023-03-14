@@ -2071,6 +2071,29 @@ void Parser::SkipMalformedDecl() {
   }
 }
 
+void ParseImplicitDeclareTargetAttr(Decl *TargetDecl) {
+  if (TargetDecl && TargetDecl->hasAttr<OMPDeclareTargetDeclAttr>() && isa<VarDecl>(TargetDecl)) {
+    VarDecl *VarFirstDecl = cast<VarDecl>(TargetDecl);
+    Expr *Ex = VarFirstDecl->getInit()->IgnoreCasts();
+    const DeclRefExpr *DeclRef = nullptr;
+    if (Ex && isa<UnaryOperator>(Ex)) {
+      if (auto *unary = cast<UnaryOperator>(Ex)) {
+	if (unary->getOpcode() == UnaryOperator::Opcode::UO_AddrOf) {
+          for (auto child : unary->children()) {
+	    if (isa<DeclRefExpr>(child)) {
+	      DeclRef = dyn_cast<DeclRefExpr>(child);
+	      Decl *DeclVar = (Decl*)DeclRef->getDecl();
+	      DeclVar->addAttr(TargetDecl->getAttr<OMPDeclareTargetDeclAttr>());
+	      ParseImplicitDeclareTargetAttr(DeclVar);
+	    }
+	  }
+	}
+      }
+    }
+  }
+  return;
+}
+
 /// ParseDeclGroup - Having concluded that this is either a function
 /// definition or a group of object declarations, actually parse the
 /// result.
@@ -2226,6 +2249,8 @@ Parser::DeclGroupPtrTy Parser::ParseDeclGroup(ParsingDeclSpec &DS,
   SmallVector<Decl *, 8> DeclsInGroup;
   Decl *FirstDecl = ParseDeclarationAfterDeclaratorAndAttributes(
       D, ParsedTemplateInfo(), FRI);
+  if (FirstDecl && FirstDecl->hasAttr<OMPDeclareTargetDeclAttr>() && isa<VarDecl>(FirstDecl))
+    ParseImplicitDeclareTargetAttr(FirstDecl);
   if (LateParsedAttrs.size() > 0)
     ParseLexedAttributeList(LateParsedAttrs, FirstDecl, true, false);
   D.complete(FirstDecl);
