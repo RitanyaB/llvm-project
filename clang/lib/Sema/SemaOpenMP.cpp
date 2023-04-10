@@ -23094,6 +23094,50 @@ void Sema::checkDeclIsAllowedInOpenMPTarget(Expr *E, Decl *D,
   checkDeclInTargetContext(E->getExprLoc(), E->getSourceRange(), *this, D);
 }
 
+Decl *AddOMPDeclareTargetDeclAttr(const DeclRefExpr *DeclRef,
+                                  Decl *TargetDecl) {
+  if (DeclRef) {
+    Decl *DeclVar = (Decl *)DeclRef->getDecl();
+    DeclVar->addAttr(TargetDecl->getAttr<OMPDeclareTargetDeclAttr>());
+    return DeclVar;
+  } else
+    return nullptr;
+}
+
+/// Adding OMPDeclareTargetDeclAttr to variables with static storage
+/// duration that are referenced in the initializer expression list of
+/// variables with static storage duration in declare target directive.
+void Sema::ActOnOpenMPImplicitDeclareTarget(Decl *TargetDecl) {
+  while (TargetDecl && TargetDecl->hasAttr<OMPDeclareTargetDeclAttr>() &&
+         isa<VarDecl>(TargetDecl)) {
+    VarDecl *TargetVarDecl = cast<VarDecl>(TargetDecl);
+    if (TargetVarDecl->hasInit()) {
+      Expr *Ex = TargetVarDecl->getInit()->IgnoreCasts();
+      const DeclRefExpr *DeclRef = nullptr;
+      if (Ex && TargetVarDecl->hasGlobalStorage()) {
+        // Handling variables initialized with address-of operator.
+        if (isa<UnaryOperator>(Ex)) {
+          auto *unary = cast<UnaryOperator>(Ex);
+          if (unary->getOpcode() == UnaryOperator::Opcode::UO_AddrOf) {
+            for (auto child : unary->children()) { // has only one child.
+              DeclRef = dyn_cast<DeclRefExpr>(child);
+              TargetDecl = AddOMPDeclareTargetDeclAttr(DeclRef, TargetDecl);
+            }
+          } else
+            break;
+        } else {
+          // Handling variables initialized with assignment.
+          DeclRef = dyn_cast<DeclRefExpr>(Ex);
+          TargetDecl = AddOMPDeclareTargetDeclAttr(DeclRef, TargetDecl);
+        }
+      } else
+        break;
+    } else
+      break;
+  }
+  return;
+}
+
 OMPClause *Sema::ActOnOpenMPToClause(
     ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
     ArrayRef<SourceLocation> MotionModifiersLoc,
