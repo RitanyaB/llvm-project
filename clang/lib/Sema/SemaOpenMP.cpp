@@ -23088,6 +23088,59 @@ void Sema::checkDeclIsAllowedInOpenMPTarget(Expr *E, Decl *D,
   checkDeclInTargetContext(E->getExprLoc(), E->getSourceRange(), *this, D);
 }
 
+class MyStmtVisitor final : public ConstStmtVisitor<MyStmtVisitor> {
+public:
+  SmallVector<Decl *> DeclVector;
+  Decl *TargetDecl;
+  void VisitDeclRefExpr(const DeclRefExpr *Node) {
+    Decl *DeclVar = nullptr;
+    if (const VarDecl *VD = dyn_cast<VarDecl>(Node->getDecl())) {
+      DeclVar = (Decl *)Node->getDecl();
+      DeclVar->addAttr((this->TargetDecl)->getAttr<OMPDeclareTargetDeclAttr>());
+      (this->DeclVector).push_back(DeclVar);
+    }
+  }
+  void VisitMyExpr(const Expr *Ex) {
+    for (Expr::const_child_iterator it = Ex->child_begin(); 
+         it != Ex->child_end(); ++it) {
+      if (isa<Expr>(*it))
+        VisitMyExpr(dyn_cast<Expr>(*it));
+      if (isa<DeclRefExpr>(*it))
+        Visit(*it);
+    }
+  }
+};
+
+/// Adding OMPDeclareTargetDeclAttr to variables with static storage
+/// duration that are referenced in the initializer expression list of
+/// variables with static storage duration in declare target directive.
+void Sema::ActOnOpenMPImplicitDeclareTarget(Decl *TargetDecl) {
+  MyStmtVisitor visitor;
+  visitor.TargetDecl = TargetDecl;
+  VarDecl *TargetVarDecl = nullptr;
+  if (TargetVarDecl = dyn_cast_or_null<VarDecl>(TargetDecl))
+    visitor.DeclVector.push_back(TargetDecl);
+  while (!visitor.DeclVector.empty()) {
+    Decl *D = visitor.DeclVector.pop_back_val();
+    TargetVarDecl = dyn_cast_or_null<VarDecl>(D);
+    if (TargetVarDecl->hasAttr<OMPDeclareTargetDeclAttr>()) {
+      if (TargetVarDecl->hasInit() && TargetVarDecl->hasGlobalStorage()) {
+        Expr *Ex = TargetVarDecl->getInit();
+        const DeclRefExpr *DeclRef = nullptr;
+        if (Ex) {
+          if (isa<DeclRefExpr>(Ex)) {
+            DeclRefExpr *DeclRef = dyn_cast<DeclRefExpr>(Ex);
+            visitor.VisitDeclRefExpr(DeclRef);
+            continue;
+          }
+          visitor.VisitMyExpr(Ex);
+        }
+      }
+    }
+  }
+  return;
+}
+
 OMPClause *Sema::ActOnOpenMPToClause(
     ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
     ArrayRef<SourceLocation> MotionModifiersLoc,

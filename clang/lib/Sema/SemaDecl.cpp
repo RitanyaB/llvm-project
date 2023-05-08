@@ -14468,6 +14468,13 @@ Sema::DeclGroupPtrTy Sema::FinalizeDeclaratorGroup(Scope *S, const DeclSpec &DS,
 
   for (unsigned i = 0, e = Group.size(); i != e; ++i) {
     if (Decl *D = Group[i]) {
+      // Check if the Decl has been declared in '#pragma omp declare target'
+      // directive and has static storage duration.
+      if (auto *VD = dyn_cast_or_null<VarDecl>(D); 
+          LangOpts.OpenMP && VD && VD->hasAttr<OMPDeclareTargetDeclAttr>() && 
+	  VD->hasGlobalStorage()) {
+        ActOnOpenMPImplicitDeclareTarget(D);
+      }
       // For declarators, there are some additional syntactic-ish checks we need
       // to perform.
       if (auto *DD = dyn_cast<DeclaratorDecl>(D)) {
